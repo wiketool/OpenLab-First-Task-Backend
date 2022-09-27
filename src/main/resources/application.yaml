@@ -1,0 +1,45 @@
+
+server:
+  port: 8080
+
+
+spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  web:
+    resources:
+      add-mappings: false
+
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    username: default
+    password:
+    lettuce:
+      pool:
+        enabled: true
+        min-idle: 2
+        max-idle: 4
+        max-active: 8
+
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://:33306/Fotilo?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: 123456
+    hikari:
+      connection-timeout: 60000
+      validation-timeout: 3000
+      idle-timeout: 50000
+      login-timeout: 5
+      max-lifetime: 60000
+      maximum-pool-size: 200
+      minimum-idle: 10
+      read-only: false
+
+logging:
+  level:
+    web: debug
+
