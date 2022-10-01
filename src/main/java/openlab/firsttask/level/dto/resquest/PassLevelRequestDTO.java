@@ -16,4 +16,7 @@ public class PassLevelRequestDTO {
     @NotNull
     @Min(0)
     private Integer levelId;
+
+    @NotNull
+    private String secret;
 }

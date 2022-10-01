@@ -4,6 +4,7 @@ import openlab.firsttask.common.annoation.ApiResponse;
 import openlab.firsttask.common.annoation.UserSession;
 import openlab.firsttask.common.entity.UserSessionDTO;
 import openlab.firsttask.common.enums.ApiExceptionEnum;
+import openlab.firsttask.common.exception.ApiException;
 import openlab.firsttask.common.utils.AssertUtils;
 import openlab.firsttask.level.dto.response.LevelPasswordResponseDTO;
 import openlab.firsttask.level.dto.response.LevelStateResponseDTO;
@@ -45,6 +46,13 @@ public class LevelController {
     @PostMapping("/pass")
     public PassLevelResponseDTO passLevel(@UserSession UserSessionDTO userSessionDTO,
                                           @RequestBody @Validated PassLevelRequestDTO requestDTO) {
+        String secretExpect = DigestUtils.md5DigestAsHex(
+                                                 MessageFormat.format("{0}{1}", userSessionDTO.getStudentId(), requestDTO.getLevelId())
+                                                              .getBytes()
+                                         )
+                                         .substring(0, 6);
+        AssertUtils.isTrue(secretExpect.equals(requestDTO.getSecret()),new ApiException(ApiExceptionEnum.REQUEST_PARAMETER_ERROR,"Unexpected Secret"));
+
         boolean isLevelIdValid = requestDTO.getLevelId() >= 0 && requestDTO.getLevelId() <= 10;
         AssertUtils.isTrue(isLevelIdValid, ApiExceptionEnum.REQUEST_PARAMETER_ERROR);
 
