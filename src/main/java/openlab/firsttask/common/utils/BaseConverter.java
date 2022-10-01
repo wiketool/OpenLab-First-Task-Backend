@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @org.mapstruct.MapperConfig
-public interface BaseConverter<S, T> extends Converter<S, T> {
+public interface BaseConverter<S, T> {
 
     /** 基础 DO、DTO 转换方法 **/
 

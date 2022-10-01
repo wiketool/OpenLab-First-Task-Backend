@@ -1,4 +1,4 @@
-package openlab.firsttask.level.dto;
+package openlab.firsttask.level.dto.response;
 
 
 import lombok.*;
@@ -9,9 +9,8 @@ import openlab.firsttask.common.entity.BaseDTO;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class LevelResponseDTO extends BaseDTO {
-
+public class PassLevelResponseDTO extends BaseDTO {
     private static final long serialVersionUID = -583971094157288719L;
-    private String state;
+    private Integer state;
     private String flag;
 }

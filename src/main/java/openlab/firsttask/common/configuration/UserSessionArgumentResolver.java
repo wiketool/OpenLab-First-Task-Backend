@@ -18,7 +18,7 @@ public class UserSessionArgumentResolver implements HandlerMethodArgumentResolve
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return (parameter.hasParameterAnnotation(UserSession.class))
-                && (UserSessionDTO.class.isAssignableFrom(parameter.getParameterType()));
+               && (UserSessionDTO.class.isAssignableFrom(parameter.getParameterType()));
     }
 
     @Override
@@ -26,8 +26,13 @@ public class UserSessionArgumentResolver implements HandlerMethodArgumentResolve
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String studentName = Optional.ofNullable(request.getHeader(RequestHeaderFields.STUDENT_NAME_HEADER_FIELD))
                                      .orElse("");
-        Long studentId = Long.parseLong(Optional.ofNullable(request.getHeader(RequestHeaderFields.STUDENT_ID_HEADER_FIELD))
-                                              .orElse("0"));
+        Long studentId = null;
+        try {
+            studentId = Long.parseLong(Optional.ofNullable(request.getHeader(RequestHeaderFields.STUDENT_ID_HEADER_FIELD))
+                                               .orElseThrow(() -> new ApiException(ApiExceptionEnum.REQUEST_HEADER_ERROR)));
+        } catch (NumberFormatException e) {
+            throw new ApiException(ApiExceptionEnum.REQUEST_HEADER_ERROR);
+        }
         UserSessionDTO userSessionDTO = UserSessionDTO.builder()
                                                       .studentId(studentId)
                                                       .studentName(studentName)
