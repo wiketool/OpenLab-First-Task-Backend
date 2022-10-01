@@ -27,9 +27,8 @@ public class LevelService {
         isExistQuery.eq(LevelDO::getStudentPKId, studentPKId);
         LevelDO levelDO = isExistQuery.one();
         if (levelDO == null) {
-            String flag = DigestUtils.md5DigestAsHex(
-                    MessageFormat.format("Level{0}{1}", passLevelRequestDTO.getLevelId(), studentPKId)
-                                 .getBytes());
+            String src = "Level"+passLevelRequestDTO.getLevelId().toString()+studentPKId.toString();
+            String flag = DigestUtils.md5DigestAsHex(src.getBytes());
             levelDO = LevelDO.builder().flag(flag)
                              .levelId(passLevelRequestDTO.getLevelId())
                              .passed(1).score(10)

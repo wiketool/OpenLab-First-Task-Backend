@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Min;
-import java.text.MessageFormat;
 
 @Controller
 @RequestMapping("/level")
@@ -48,12 +47,10 @@ public class LevelController {
     @PostMapping("/pass")
     public PassLevelResponseDTO passLevel(@UserSession UserSessionDTO userSessionDTO,
                                           @RequestBody @Validated PassLevelRequestDTO requestDTO) {
-        String secretExpect = DigestUtils.md5DigestAsHex(
-                                                 MessageFormat.format("{0}{1}", userSessionDTO.getStudentId(), requestDTO.getLevelId())
-                                                              .getBytes()
-                                         )
-                                         .substring(0, 6);
-        AssertUtils.isTrue(secretExpect.equals(requestDTO.getSecret()),new ApiException(ApiExceptionEnum.REQUEST_PARAMETER_ERROR,"Unexpected Secret"));
+        String src = userSessionDTO.getStudentId().toString() + requestDTO.getLevelId().toString();
+        String secretExpect = DigestUtils.md5DigestAsHex(src.getBytes()).substring(0, 6).toUpperCase();
+
+        AssertUtils.isTrue(secretExpect.equals(requestDTO.getSecret()), new ApiException(ApiExceptionEnum.REQUEST_PARAMETER_ERROR, "Unexpected Secret"));
 
         boolean isLevelIdValid = requestDTO.getLevelId() >= 0 && requestDTO.getLevelId() <= 10;
         AssertUtils.isTrue(isLevelIdValid, ApiExceptionEnum.REQUEST_PARAMETER_ERROR);
@@ -100,7 +97,7 @@ public class LevelController {
         Long studentPKId = studentService.selectOrInsertStudent(studentDTO);
         LevelPasswordResponseDTO responseDTO = levelService.verifyLevelPassword(password, studentPKId);
 
-        if(responseDTO.getPassed() == 0){
+        if (responseDTO.getPassed() == 0) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         }
         return responseDTO;
@@ -116,7 +113,7 @@ public class LevelController {
         Long studentPKId = studentService.selectOrInsertStudent(studentDTO);
         LevelPasswordResponseDTO responseDTO = levelService.verifyLevelPassword(requestDTO.getPassword(), studentPKId);
 
-        if(responseDTO.getPassed() == 0){
+        if (responseDTO.getPassed() == 0) {
             httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         }
         return responseDTO;
