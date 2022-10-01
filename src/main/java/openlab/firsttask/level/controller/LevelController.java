@@ -17,11 +17,13 @@ import openlab.firsttask.level.service.LevelService;
 import openlab.firsttask.student.dto.StudentDTO;
 import openlab.firsttask.student.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.DigestUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Min;
 import java.text.MessageFormat;
 
@@ -91,22 +93,32 @@ public class LevelController {
     @ApiResponse
     @GetMapping("/5/check_password")
     public LevelPasswordResponseDTO level5CheckPassword(@UserSession UserSessionDTO userSessionDTO,
-                                                        @RequestParam String password) {
+                                                        @RequestParam String password,
+                                                        HttpServletResponse httpServletResponse) {
         StudentDTO studentDTO = StudentDTO.builder().name(userSessionDTO.getStudentName())
                                           .studentId(userSessionDTO.getStudentId()).build();
         Long studentPKId = studentService.selectOrInsertStudent(studentDTO);
         LevelPasswordResponseDTO responseDTO = levelService.verifyLevelPassword(password, studentPKId);
+
+        if(responseDTO.getPassed() == 0){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        }
         return responseDTO;
     }
 
     @ApiResponse
     @PostMapping("/6/check_password")
     public LevelPasswordResponseDTO level6CheckPassword(@UserSession UserSessionDTO userSessionDTO,
-                                                        @RequestBody LevelPasswordRequestDTO requestDTO) {
+                                                        @RequestBody LevelPasswordRequestDTO requestDTO,
+                                                        HttpServletResponse httpServletResponse) {
         StudentDTO studentDTO = StudentDTO.builder().name(userSessionDTO.getStudentName())
                                           .studentId(userSessionDTO.getStudentId()).build();
         Long studentPKId = studentService.selectOrInsertStudent(studentDTO);
         LevelPasswordResponseDTO responseDTO = levelService.verifyLevelPassword(requestDTO.getPassword(), studentPKId);
+
+        if(responseDTO.getPassed() == 0){
+            httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        }
         return responseDTO;
     }
 
