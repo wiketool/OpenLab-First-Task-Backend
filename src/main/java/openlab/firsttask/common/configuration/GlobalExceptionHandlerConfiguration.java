@@ -6,6 +6,7 @@ import openlab.firsttask.common.enums.ApiExceptionEnum;
 import openlab.firsttask.common.exception.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("rawtypes")
 @ControllerAdvice
@@ -41,8 +44,14 @@ public class GlobalExceptionHandlerConfiguration {
     }
 
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ResultVO> httpRequestMethodNotSupportedExceptionHandler(Exception e) {
+    public ResponseEntity<ResultVO> httpRequestMethodNotSupportedExceptionHandler(Exception e,
+                                                                                  HttpServletResponse httpServletResponse) {
+        HttpRequestMethodNotSupportedException ex = (HttpRequestMethodNotSupportedException) e;
+        HttpHeaders allowMethods = new HttpHeaders();
+        allowMethods.setAllow(ex.getSupportedHttpMethods());
+
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                             .headers(allowMethods)
                              .body(ResultVO.error(ApiExceptionEnum.UNSUPPORTED_HTTP_REQUEST_METHOD));
     }
 
