@@ -3,6 +3,8 @@ package openlab.firsttask.level.controller;
 import openlab.firsttask.common.annoation.ApiResponse;
 import openlab.firsttask.common.annoation.UserSession;
 import openlab.firsttask.common.entity.UserSessionDTO;
+import openlab.firsttask.common.enums.ApiExceptionEnum;
+import openlab.firsttask.common.utils.AssertUtils;
 import openlab.firsttask.level.dto.response.LevelPasswordResponseDTO;
 import openlab.firsttask.level.dto.response.LevelStateResponseDTO;
 import openlab.firsttask.level.dto.response.PassLevelResponseDTO;
@@ -35,19 +37,22 @@ public class LevelController {
     /**
      * 通过关卡
      *
-     * @param userSessionDTO      用户身份dto
-     * @param passLevelRequestDTO 通过关卡 请求dto
+     * @param userSessionDTO 用户身份dto
+     * @param requestDTO     通过关卡 请求dto
      * @return {@link PassLevelResponseDTO}
      */
     @ApiResponse
     @PostMapping("/pass")
     public PassLevelResponseDTO passLevel(@UserSession UserSessionDTO userSessionDTO,
-                                          @RequestBody @Validated PassLevelRequestDTO passLevelRequestDTO) {
+                                          @RequestBody @Validated PassLevelRequestDTO requestDTO) {
+        boolean isLevelIdValid = requestDTO.getLevelId() >= 0 && requestDTO.getLevelId() <= 10;
+        AssertUtils.isTrue(isLevelIdValid, ApiExceptionEnum.REQUEST_PARAMETER_ERROR);
+
         StudentDTO studentDTO = StudentDTO.builder().name(userSessionDTO.getStudentName())
                                           .studentId(userSessionDTO.getStudentId()).build();
         Long studentPKId = studentService.selectOrInsertStudent(studentDTO);
         userSessionDTO.setStudentPKId(studentPKId);
-        PassLevelResponseDTO responseDTO = levelService.selectOrInsertPassLevelInfo(passLevelRequestDTO, studentPKId);
+        PassLevelResponseDTO responseDTO = levelService.selectOrInsertPassLevelInfo(requestDTO, studentPKId);
         return responseDTO;
     }
 
@@ -78,7 +83,7 @@ public class LevelController {
     @ApiResponse
     @GetMapping("/5/check_password")
     public LevelPasswordResponseDTO level5CheckPassword(@UserSession UserSessionDTO userSessionDTO,
-                                                        @RequestParam String password){
+                                                        @RequestParam String password) {
         StudentDTO studentDTO = StudentDTO.builder().name(userSessionDTO.getStudentName())
                                           .studentId(userSessionDTO.getStudentId()).build();
         Long studentPKId = studentService.selectOrInsertStudent(studentDTO);
@@ -89,7 +94,7 @@ public class LevelController {
     @ApiResponse
     @PostMapping("/6/check_password")
     public LevelPasswordResponseDTO level6CheckPassword(@UserSession UserSessionDTO userSessionDTO,
-                                                        @RequestBody LevelPasswordRequestDTO requestDTO){
+                                                        @RequestBody LevelPasswordRequestDTO requestDTO) {
         StudentDTO studentDTO = StudentDTO.builder().name(userSessionDTO.getStudentName())
                                           .studentId(userSessionDTO.getStudentId()).build();
         Long studentPKId = studentService.selectOrInsertStudent(studentDTO);
