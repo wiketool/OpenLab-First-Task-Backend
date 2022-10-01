@@ -30,7 +30,7 @@ public class GlobalExceptionHandlerConfiguration {
     @ExceptionHandler(value = ApiException.class)
     public ResponseEntity<ResultVO> apiExceptionHandler(ApiException e) {
         logException(e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.status(e.getHttpStatus())
                              .body(ResultVO.error(e));
     }
 
@@ -48,7 +48,7 @@ public class GlobalExceptionHandlerConfiguration {
 
     @ExceptionHandler(value = {MethodArgumentNotValidException.class, MissingServletRequestParameterException.class})
     public ResponseEntity<ResultVO> methodArgumentNotValidExceptionHandler(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                              .body(ResultVO.error((ApiExceptionEnum.REQUEST_PARAMETER_ERROR)));
     }
 
